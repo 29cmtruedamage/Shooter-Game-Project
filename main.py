@@ -22,12 +22,9 @@ class Shooter_Game:
         self.all_sprites = AllSprites()
         self.obstacle_group = pygame.sprite.Group()
         
-        
-        
-
     def setup_map(self):
         map = load_pygame(join('assets', 'map', 'map.tmx'))
-
+        
         for x,y,surface in map.get_layer_by_name('Untergrund').tiles():
             TileSprites((self.TILE_SIZE * x,self.TILE_SIZE * y), surface, self.all_sprites)
         
@@ -37,22 +34,25 @@ class Shooter_Game:
         for border in map.get_layer_by_name('borders'):
             Obstacles((border.x, border.y), pygame.Surface((border.width, border.height)), self.obstacle_group)
 
-        self.player = Player((1000 + 600, 1000 + 300), self.all_sprites, self.obstacle_group)
-    async def runGame(self):
-        
-        
+        for sp in map.get_layer_by_name('spawnpoint_player'):
+            player_pos = (sp.x, sp.y)
+        self.player = Player(player_pos, (self.all_sprites), self.obstacle_group)
 
+        
+    async def runGame(self):
         while self.gameState:
             delta_t = self.clock.tick() / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.gameState = False
-               
+            
+
             
             self.screen.fill((0,200,0))
             
             self.all_sprites.update(delta_t)
-            self.all_sprites.custom_draw(self.player.direction)
+            
+            self.all_sprites.draw(self.player.rect.center)
             
 
             #self.clock.tick(self.FPS)
