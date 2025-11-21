@@ -5,7 +5,8 @@ class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacle_group):
         super().__init__(groups)
         self.image = pygame.image.load(join('images', 'player', 'down', '3.png')).convert_alpha()
-        self.rect = self.image.get_frect(center = pos)
+        self.pos = pos
+        self.rect = self.image.get_frect(center = self.pos)
         self.obstacle_group = obstacle_group
         self.direction = pygame.Vector2(0, 0)
         self.speed = 520
@@ -36,8 +37,6 @@ class Player(pygame.sprite.Sprite):
                 if self.hitbox.left > g.rect.right - 20: self.hitbox.left = g.rect.right #rechts
                 if self.hitbox.bottom < g.rect.top + 20: self.hitbox.bottom = g.rect.top
                 if self.hitbox.top > g.rect.bottom -20: self.hitbox.top = g.rect.bottom
-
-
 
 
     def update(self, delta_t):

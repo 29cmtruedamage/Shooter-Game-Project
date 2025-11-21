@@ -1,0 +1,44 @@
+{
+    "activeFile": "map.tmx",
+    "fileStates": {
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel_klein.tsx": {
+            "dynamicWrapping": false,
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/obstacles.tsx": {
+            "dynamicWrapping": true,
+            "scaleInDock": 0.75,
+            "scaleInEditor": 1
+        },
+        "map.tmx": {
+            "expandedObjectLayers": [
+                2,
+                3
+            ],
+            "scale": 0.33,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 2968.181818181818,
+                "y": 1534.8484848484848
+            }
+        }
+    },
+    "openFiles": [
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel.tsx",
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel_klein.tsx",
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/obstacles.tsx",
+        "map.tmx"
+    ],
+    "recentFiles": [
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel.tsx",
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/map_kachel_klein.tsx",
+        "C:/Users/muham/Pygame/Shooter-Game-Project/assets/tilesets/obstacles.tsx",
+        "map.tmx"
+    ]
+}
