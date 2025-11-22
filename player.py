@@ -1,18 +1,23 @@
 import pygame
 from os.path import join
+from os import walk
 import math
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacle_group):
         super().__init__(groups)
-        self.image = pygame.image.load(join('images', 'player', 'down', '3.png')).convert_alpha()
+        self.all_movements = {'down': [], 'up': [], 'left': [], 'right': []}
+        self.load_animations()
+        self.image = self.all_movements['left'][0]
         self.pos = pos
         self.rect = self.image.get_frect(center = self.pos)
         self.obstacle_group = obstacle_group
         self.direction = pygame.Vector2(0, 0)
         self.additional_speed = 520
-        self.hitbox = self.rect.inflate(-55, -90)
+        self.hitbox = self.rect.inflate(-55, -110)
         self.type = 'player'
+        self.index = 0
 
+    #handles the keyboard input (WASD)
     def input_handling(self):
         keys = pygame.key.get_pressed()
         self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a]) 
@@ -20,9 +25,31 @@ class Player(pygame.sprite.Sprite):
         if self.direction.x != 0 and self.direction.y != 0:
             self.direction.x *= math.sqrt(0.5)
             self.direction.y *= math.sqrt(0.5) 
-        # -> a^2 + b^2 = c^2, hat endlich mal was gebracht im Leben :)
-        # -> sqrt(0.5)^2 * sqrt(0.5)^2 = 1 -> normiert
+            # -> a^2 + b^2 = c^2, hat endlich mal was gebracht im Leben :)
+            # -> sqrt(0.5)^2 * sqrt(0.5)^2 = 1 -> normiert
+        if self.direction.x > 0: self.animation_maker('right')
+        if self.direction.x < 0: self.animation_maker('left')
+        if self.direction.y > 0: self.animation_maker('down')
+        if self.direction.y < 0: self.animation_maker('up')
 
+        
+    #load all pictures of Player from the folder image/player
+    def load_animations(self):
+        for direction in self.all_movements.keys():
+            for path, subfolder, files in walk(join('images', 'player', direction)): #walk return names of files in a list
+                for file in files:
+                    surf = pygame.image.load(join(path, file)).convert_alpha()
+                    self.all_movements[direction].append(surf)
+                    print(join(path, file))
+
+
+    #animate the player based on the state
+    def animation_maker(self, state):
+        self.index += 0.035 #Geschwindigkeit der Animation
+        self.index %= 4     #Anzahl Bilder pro richtung
+        self.image = self.all_movements[state][int(self.index)]
+
+    #calculates the new position after imput handling
     def movement_handling(self, delta_t):
         self.hitbox.x += self.direction.x * self.additional_speed * delta_t
         self.collision_handling()
@@ -30,6 +57,7 @@ class Player(pygame.sprite.Sprite):
         self.collision_handling()
         self.rect.center = self.hitbox.center  
 
+    #handles collision between player and obstacles
     def collision_handling(self):
         for g in self.obstacle_group:
             if self.hitbox.colliderect(g.rect):
