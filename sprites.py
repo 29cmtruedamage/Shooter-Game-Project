@@ -40,7 +40,7 @@ class Gun(pygame.sprite.Sprite):
 
     def rotate_gun(self):
         angle = degrees(atan2(self.player_dir.x, self.player_dir.y)) - 90
-        if self.player_dir.x > 0.5: 
+        if self.player_dir.x > 0: 
             self.image = pygame.transform.rotozoom(self.gun_surf, angle, 1)
         else:
             self.image = pygame.transform.rotozoom(self.gun_surf, angle*-1, 1)
@@ -51,36 +51,23 @@ class Gun(pygame.sprite.Sprite):
         self.rotate_gun()
         self.rect.center = self.player.rect.center + self.distance * self.player_dir
 
-    
 class Bullet(pygame.sprite.Sprite):
-    def __init__(self, player, groups):
+    def __init__(self, surf, pos, direction, groups):
         super().__init__(groups)
-        self.player = player
-        self.player_dir = pygame.Vector2(0,1)
-        self.distance = 160
-        self.gun_surf = pygame.image.load(join('images', 'gun', 'bullet.png')).convert_alpha()
-        self.image = self.gun_surf
-        self.rect = self.image.get_frect(center = self.player.rect.center + self.player_dir * self.distance)
+        self.image = surf
+        self.rect = self.image.get_frect(center = pos)
+        self.direction = direction
+        self.speed = 1200
         self.type = 'bullet'
+        self.born_date = pygame.time.get_ticks()
+        self.death_time= self.born_date + 2000
+        self.current_lifetime = 0
 
-    def get_direction(self):
-        mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
-        default_pos = pygame.Vector2(SCRREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
-        self.player_dir = (mouse_pos - default_pos).normalize()
-
-    def rotate_gun(self):
-        angle = degrees(atan2(self.player_dir.x, self.player_dir.y)) - 90
-        if self.player_dir.x > 0.5: 
-            self.image = pygame.transform.rotozoom(self.gun_surf, angle, 1)
-        else:
-            self.image = pygame.transform.rotozoom(self.gun_surf, angle*-1, 1)
-            self.image = pygame.transform.flip(self.image, False, True)
-
-    def update(self, _):
-        self.get_direction()
-        self.rotate_gun()
-        self.rect.center = self.player.rect.center + self.distance * self.player_dir
-
+    def update(self, delta_t):
+        self.current_lifetime += 5
+        self.rect.center += self.direction * self.speed * delta_t
+        if self.death_time - self.current_lifetime < self.born_date:
+            self.kill()
 #Class is a group, like a list, in which all classes which can be seen are in, like player, tiles, obst.
 # We have to add them all up in this class, to manage the screening of all instances/Objects in the game
 # with certain structure and logic

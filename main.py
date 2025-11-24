@@ -6,6 +6,7 @@ from pytmx.util_pygame import load_pygame
 #https://pytmx.readthedocs.io/en/latest/#tile-object-and-map-properties
 from random import randint
 from os.path import join
+import time
 
 
 class Shooter_Game:
@@ -21,7 +22,14 @@ class Shooter_Game:
         self.gameState = True
         self.all_sprites = AllSprites()
         self.obstacle_group = pygame.sprite.Group()
-        
+        self.shooting_group = pygame.sprite.Group()
+
+        self.shoot_timer = 0
+        self.shoot_rate = 50
+        self.bullet_surf = pygame.image.load(join('images', 'gun', 'bullet.png')).convert_alpha()
+    def load_dynamic_images(self):
+        self.bullet_surf = pygame.image.load(join('images', 'gun', 'bullet.png'))
+
     def setup_map(self):
         map = load_pygame(join('assets', 'map', 'map.tmx'))
         
@@ -43,16 +51,29 @@ class Shooter_Game:
         self.player = Player(player_pos, (self.all_sprites), self.obstacle_group)
 
         self.gun = Gun(self.player, self.all_sprites)
-       
-        
+
+    def input_handling(self):
+        leftclick = pygame.mouse.get_pressed()[0]
+        self.shoot_timer += 1
+
+        if leftclick and self.shoot_timer > self.shoot_rate:
+            pos = self.gun.rect.center + self.gun.player_dir * 100
+            print("Shoot")
+            Bullet(self.bullet_surf, pos, self.gun.player_dir, (self.all_sprites, self.shooting_group))
+            self.shoot_timer = 0
+            
+
+
+
     async def runGame(self):
+        self.setup_map()
         while self.gameState:
             delta_t = self.clock.tick() / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.gameState = False
             
-
+            self.input_handling()
             
             self.screen.fill((0,200,0))
             
@@ -63,13 +84,12 @@ class Shooter_Game:
             #self.clock.tick(self.FPS)
             pygame.display.flip()
             await asyncio.sleep(0)
-
+            print(self.shooting_group)
         pygame.quit()
         
 
 async def main():
     game = Shooter_Game()
-    game.setup_map()
     await game.runGame()
 
 if __name__ == "__main__":
