@@ -76,8 +76,9 @@ class Gun(pygame.sprite.Sprite):
         self.player = player
         self.player_dir = pygame.Vector2(0,1)
         self.distance = 80
-        self.gun_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'gun.png')), 0, 0.8).convert_alpha()
-        
+        self.glock_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'gun.png')), 0, 0.8).convert_alpha()
+        self.uzi_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'Uzi.png')), 0, 0.25).convert_alpha()
+        self.gun_surf = self.glock_surf
         self.image = self.gun_surf
         self.rect = self.image.get_frect(center = self.player.rect.center + self.player_dir * self.distance)
         self.type = 'gun'
@@ -99,6 +100,11 @@ class Gun(pygame.sprite.Sprite):
         self.get_direction()
         self.rotate_gun()
         self.rect.center = self.player.rect.center + self.distance * self.player_dir
+
+class Score(pygame.sprite.Sprite):
+    def __init__(self, player, groups):
+        super().__init__(groups)
+        self.player = player
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, surf, pos, direction, groups, enemy_group):

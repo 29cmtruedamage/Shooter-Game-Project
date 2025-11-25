@@ -20,7 +20,7 @@ class Shooter_Game:
         self.clock  = pygame.time.Clock()
         self.FPS = 60
         self.gameState = True
-
+        self.gameOver = True
         #Groups
         self.all_sprites = AllSprites()
         self.obstacle_group = pygame.sprite.Group()
@@ -29,7 +29,8 @@ class Shooter_Game:
         
         #Gun parameters
         self.shoot_timer = 0
-        self.shoot_rate = 50
+        self.shoot_rate = 50 #glock
+        self.shoot_rate_uzi = 50
 
         #custom events
         self.enemie_spawnEvent = pygame.event.custom_type()
@@ -37,12 +38,23 @@ class Shooter_Game:
         pygame.time.set_timer(self.enemie_spawnEvent, self.enemie_spawnTime)
         self.enemie_spawnPlace = []
         
-        #sounds
+        #score 
+        self.score = 0
+        self.score_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 55)
+        self.score_text = self.score_font.render("Kills: ", True, 'Red')
+        
+        #health
+        #//
+        
+    #sounds
+    def load_sounds(self):
         self.shoot_sound = pygame.mixer.Sound(join('sound','shoot_sound.wav'))
-        self.shoot_sound.set_volume(0.5)
+        self.shoot_sound.set_volume(0.4)
         self.deat_sound = pygame.mixer.Sound(join('sound','death_sound.wav'))
-        self.deat_sound.set_volume(0.5)
-
+        self.deat_sound.set_volume(0.6)
+        self.bg_sound = pygame.mixer.Sound(join('sound','bg_sound.mp3'))
+        self.bg_sound.set_volume(0.6)
+        self.bg_sound.play(5)
 
     def load_dynamic_images(self):
         self.bullet_surf = pygame.image.load(join('images', 'gun', 'bullet.png')).convert_alpha()
@@ -76,9 +88,13 @@ class Shooter_Game:
         #gets one predefined spawnpoint on map and let player spawn at this point
         for sp in map.get_layer_by_name('spawnpoint_player'):
             player_pos = (sp.x, sp.y)
-        self.player = Player(player_pos, (self.all_sprites), self.obstacle_group)
 
+        self.player = Player(player_pos, (self.all_sprites), self.obstacle_group, self.enemy_group)
         self.gun = Gun(self.player, self.all_sprites)
+        self.score_rect = self.score_text.get_rect(center=(SCRREEN_WIDTH / 10, 50))
+
+    def update_score(self):
+        self.score_text = self.score_font.render(f"KILLS: {self.score}", True, (189,61,61))
 
     def input_handling(self):
         leftclick = pygame.mouse.get_pressed()[0]
@@ -100,11 +116,21 @@ class Shooter_Game:
                     bullet.kill()
                     self.deat_sound.play()
 
+    def check_death(self):
+        #unser leben: self.health
+        if self.player.health < 1:      
+            self.gameOver = False
+            print("DU BSIT TOOOOOOOOOOOOOT")
+    
+    def gameOver_screen(self):
+        pass
 
-    async def runGame(self):
+    def runGame(self):
         self.setup_game()
         self.load_dynamic_images()
+        self.load_sounds()
         while self.gameState:
+            
             delta_t = self.clock.tick() / 1000
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -112,26 +138,28 @@ class Shooter_Game:
                 if event.type == self.enemie_spawnEvent:
                     type = random.choice(['bat', 'blob', 'skeleton'])
                     pos = random.choice(self.enemie_spawnPlace)
-                    print(type)
-                    Enemy(self.enemies[type], pos, self.player, (self.all_sprites, self.enemy_group), self.obstacle_group, self.bullet_group)
                     
-            self.input_handling()
+                    Enemy(self.enemies[type], pos, self.player, (self.all_sprites, self.enemy_group), self.obstacle_group, self.bullet_group)
             
+            self.check_death()
+            self.input_handling()
+            self.update_score()
             self.screen.fill((0,200,0))
             self.check_bullet_enemy_collision()
             self.all_sprites.update(delta_t)
             
             self.all_sprites.draw(self.player.rect.center)
+            self.screen.blit(self.score_text, self.score_rect)
+            pygame.display.flip()
+            print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}")
+            
             
             pygame.display.flip()
-            await asyncio.sleep(0)
-            
         pygame.quit()
-        
 
-async def main():
+def main():
     game = Shooter_Game()
-    await game.runGame()
+    game.runGame()
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()

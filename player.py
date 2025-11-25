@@ -5,7 +5,7 @@ import math
 from globals import SCRREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_group):
+    def __init__(self, pos, groups, obstacle_group, enemy_group):
         super().__init__(groups)
         self.all_movements = {'down': [], 'up': [], 'left': [], 'right': []}
         self.load_animations()
@@ -13,12 +13,14 @@ class Player(pygame.sprite.Sprite):
         self.pos = pos
         self.rect = self.image.get_frect(center = self.pos)
         self.obstacle_group = obstacle_group
+        self.enemy_group = enemy_group
         self.direction = pygame.Vector2(0, 0)
         self.additional_speed = 520
         self.hitbox = self.rect.inflate(-55, -110)
         self.type = 'player'
         self.index = 0
-
+        self.health = 3
+        self.recovery_time = 200
         self.sprinting = False
 
     #handles the keyboard input (WASD)
@@ -69,6 +71,15 @@ class Player(pygame.sprite.Sprite):
         self.collision_handling()
         self.rect.center = self.hitbox.center  
 
+    def check_enemy_collision(self):
+        self.recovery_time += 1
+        if self.recovery_time > 400:
+            for enemy in self.enemy_group:
+                if self.hitbox.colliderect(enemy.hitbox):
+                    self.health -= 1
+                    self.recovery_time = 0
+
+
     #handles collision between player and obstacles
     def collision_handling(self):
         for g in self.obstacle_group:
@@ -77,8 +88,10 @@ class Player(pygame.sprite.Sprite):
                 if self.hitbox.left > g.rect.right - 20: self.hitbox.left = g.rect.right #rechts
                 if self.hitbox.bottom < g.rect.top + 20: self.hitbox.bottom = g.rect.top
                 if self.hitbox.top > g.rect.bottom -20: self.hitbox.top = g.rect.bottom
-                
+
+
     def update(self, delta_t):
         self.input_handling()
         self.movement_handling(delta_t)
+        self.check_enemy_collision()
         
