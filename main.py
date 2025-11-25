@@ -36,9 +36,13 @@ class Shooter_Game:
         self.enemie_spawnTime = 500
         pygame.time.set_timer(self.enemie_spawnEvent, self.enemie_spawnTime)
         self.enemie_spawnPlace = []
+        
+        #sounds
+        self.shoot_sound = pygame.mixer.Sound(join('sound','shoot_sound.wav'))
+        self.shoot_sound.set_volume(0.5)
+        self.deat_sound = pygame.mixer.Sound(join('sound','death_sound.wav'))
+        self.deat_sound.set_volume(0.5)
 
-        #score
-        self.score = 0
 
     def load_dynamic_images(self):
         self.bullet_surf = pygame.image.load(join('images', 'gun', 'bullet.png')).convert_alpha()
@@ -48,9 +52,6 @@ class Shooter_Game:
                 for file in files:
                     surf = pygame.image.load(join(path, file)).convert_alpha()
                     self.enemies[enemie].append(surf)
-
-        
-
 
 
     def setup_game(self):
@@ -85,7 +86,7 @@ class Shooter_Game:
 
         if leftclick and self.shoot_timer > self.shoot_rate:
             pos = self.gun.rect.center + self.gun.player_dir * 100
-            print("Shoot")
+            self.shoot_sound.play()
             Bullet(self.bullet_surf, pos, self.gun.player_dir, (self.all_sprites, self.bullet_group), self.enemy_group)
             self.shoot_timer = 0
             
@@ -97,12 +98,12 @@ class Shooter_Game:
                     self.score += 1
                     enemy.kill()
                     bullet.kill()
+                    self.deat_sound.play()
 
 
     async def runGame(self):
         self.setup_game()
         self.load_dynamic_images()
-
         while self.gameState:
             delta_t = self.clock.tick() / 1000
             for event in pygame.event.get():
@@ -121,7 +122,7 @@ class Shooter_Game:
             self.all_sprites.update(delta_t)
             
             self.all_sprites.draw(self.player.rect.center)
-
+            
             pygame.display.flip()
             await asyncio.sleep(0)
             
