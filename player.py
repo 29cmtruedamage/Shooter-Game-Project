@@ -2,6 +2,8 @@ import pygame
 from os.path import join
 from os import walk
 import math
+from globals import SCRREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
+
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos, groups, obstacle_group):
         super().__init__(groups)
@@ -17,21 +19,29 @@ class Player(pygame.sprite.Sprite):
         self.type = 'player'
         self.index = 0
 
+        self.sprinting = False
+
     #handles the keyboard input (WASD)
     def input_handling(self):
         keys = pygame.key.get_pressed()
-        self.direction.x = int(keys[pygame.K_d]) - int(keys[pygame.K_a]) 
-        self.direction.y = int(keys[pygame.K_s]) - int(keys[pygame.K_w])
+        self.sprinting = int(keys[pygame.K_LSHIFT]) * 0.35
+        self.direction.x = (int(keys[pygame.K_d]) - int(keys[pygame.K_a])) * (0.75 + self.sprinting)
+        self.direction.y = (int(keys[pygame.K_s]) - int(keys[pygame.K_w])) * (0.75 + self.sprinting)
+
         if self.direction.x != 0 and self.direction.y != 0:
             self.direction.x *= math.sqrt(0.5)
             self.direction.y *= math.sqrt(0.5) 
             # -> a^2 + b^2 = c^2, hat endlich mal was gebracht im Leben :)
             # -> sqrt(0.5)^2 * sqrt(0.5)^2 = 1 -> normiert
-        if self.direction.x > 0: self.animation_maker('right')
-        if self.direction.x < 0: self.animation_maker('left')
-        if self.direction.y > 0: self.animation_maker('down')
-        if self.direction.y < 0: self.animation_maker('up')
+            if self.direction.x > 0: self.animation_maker('right')
+            if self.direction.x < 0: self.animation_maker('left')
+        else:    
+            if self.direction.x > 0: self.animation_maker('right')
+            if self.direction.x < 0: self.animation_maker('left')
+            if self.direction.y > 0: self.animation_maker('down')
+            if self.direction.y < 0: self.animation_maker('up')
 
+        
         
     #load all pictures of Player from the folder image/player
     def load_animations(self):
@@ -43,9 +53,11 @@ class Player(pygame.sprite.Sprite):
                     print(join(path, file))
 
 
-    #animate the player based on the state
+    #animate the player based on the direction
     def animation_maker(self, state):
         self.index += 0.035 #Geschwindigkeit der Animation
+        if self.sprinting:
+            self.index += 0.02
         self.index %= 4     #Anzahl Bilder pro richtung
         self.image = self.all_movements[state][int(self.index)]
 
