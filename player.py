@@ -23,6 +23,9 @@ class Player(pygame.sprite.Sprite):
         self.recovery_time = 200
         self.sprinting = False
 
+        self.hit_sound = pygame.mixer.Sound(join('sound','hit_sound.mp3'))
+        self.hit_sound.set_volume(1.5)
+
     #handles the keyboard input (WASD)
     def input_handling(self):
         keys = pygame.key.get_pressed()
@@ -42,9 +45,7 @@ class Player(pygame.sprite.Sprite):
             if self.direction.x < 0: self.animation_maker('left')
             if self.direction.y > 0: self.animation_maker('down')
             if self.direction.y < 0: self.animation_maker('up')
-
-        
-        
+ 
     #load all pictures of Player from the folder image/player
     def load_animations(self):
         for direction in self.all_movements.keys():
@@ -53,7 +54,6 @@ class Player(pygame.sprite.Sprite):
                     surf = pygame.image.load(join(path, file)).convert_alpha()
                     self.all_movements[direction].append(surf)
                     print(join(path, file))
-
 
     #animate the player based on the direction
     def animation_maker(self, state):
@@ -73,12 +73,12 @@ class Player(pygame.sprite.Sprite):
 
     def check_enemy_collision(self):
         self.recovery_time += 1
-        if self.recovery_time > 400:
-            for enemy in self.enemy_group:
+        for enemy in self.enemy_group:
+            if self.recovery_time > 400: # You have 400ms to flee away from enemies
                 if self.hitbox.colliderect(enemy.hitbox):
+                    self.hit_sound.play()
                     self.health -= 1
                     self.recovery_time = 0
-
 
     #handles collision between player and obstacles
     def collision_handling(self):
@@ -88,7 +88,6 @@ class Player(pygame.sprite.Sprite):
                 if self.hitbox.left > g.rect.right - 20: self.hitbox.left = g.rect.right #rechts
                 if self.hitbox.bottom < g.rect.top + 20: self.hitbox.bottom = g.rect.top
                 if self.hitbox.top > g.rect.bottom -20: self.hitbox.top = g.rect.bottom
-
 
     def update(self, delta_t):
         self.input_handling()

@@ -21,7 +21,7 @@ class Obstacles(pygame.sprite.Sprite):
         self.type = 'obstacle'
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, frames, pos, player, groups, obstacle_group, bullet_group):
+    def __init__(self, frames, pos, player, groups, obstacle_group, bullet_group, hardMode):
         super().__init__(groups)
         self.frames = frames
         self.player = player
@@ -32,8 +32,9 @@ class Enemy(pygame.sprite.Sprite):
         self.rect = self.image.get_frect(center = pos)
         self.hitbox = self.rect.inflate(-20, -40)
         self.direction = pygame.Vector2()
-        self.speed = 170
         self.type = 'enemy'
+        self.speed = 160
+        if hardMode: self.speed = 220
 
     def animation_maker(self):
         self.index += 0.035 #Geschwindigkeit der Animation
@@ -59,29 +60,27 @@ class Enemy(pygame.sprite.Sprite):
                 if self.hitbox.bottom < g.rect.top + 20: self.hitbox.bottom = g.rect.top
                 if self.hitbox.top > g.rect.bottom -20: self.hitbox.top = g.rect.bottom
 
-    def check_hit(self):
-        pass
-        # for bullet in self.bullet_group:
-        #     if self.rect.colliderect(bullet.rect):
-        #         self.kill()
 
-    def update(self, delta_t):
-        self.check_hit()
+    def update(self, delta_t): 
         self.movement(delta_t)
         self.animation_maker()
 
 class Gun(pygame.sprite.Sprite):
-    def __init__(self, player, groups):
+    def __init__(self, player, groups, gunType):
         super().__init__(groups)
         self.player = player
         self.player_dir = pygame.Vector2(0,1)
         self.distance = 80
-        self.glock_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'gun.png')), 0, 0.8).convert_alpha()
-        self.uzi_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'Uzi.png')), 0, 0.25).convert_alpha()
-        self.gun_surf = self.glock_surf
+
+        if gunType=='glock': 
+            self.gun_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'gun.png')), 0, 0.8).convert_alpha()
+            self.type = 'glock'
+        if gunType=='uzi':   
+            self.gun_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'Uzi.png')), 0, 0.25).convert_alpha()
+            self.type = 'uzi'
         self.image = self.gun_surf
         self.rect = self.image.get_frect(center = self.player.rect.center + self.player_dir * self.distance)
-        self.type = 'gun'
+        
 
     def get_direction(self):
         mouse_pos = pygame.Vector2(pygame.mouse.get_pos())
