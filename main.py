@@ -31,12 +31,13 @@ class Shooter_Game:
         #Gun parameters
         self.shoot_timer = 0
         self.shoot_rate_glock = 100 #glock
-        self.shoot_rate_uzi = 40
+        self.shoot_rate_uzi = 40 #uzi
+
         self.shoot_rate = self.shoot_rate_glock
 
         #custom events / time based eventy
         self.enemie_spawnEvent = pygame.event.custom_type()
-        self.enemie_spawnTime = 500
+        self.enemie_spawnTime = 400
         pygame.time.set_timer(self.enemie_spawnEvent, self.enemie_spawnTime)
         self.enemie_spawnPlace = []
         self.sp_pos = (0,0)
@@ -46,10 +47,16 @@ class Shooter_Game:
         #score 
         self.score = 0
         #score Fonts
-        self.score_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 55)
+        self.score_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 53)
         self.score_text = self.score_font.render("Kills: ", True, 'Red')
         self.score_rect = self.score_text.get_rect(center=(SCRREEN_WIDTH / 10, 50))
 
+        #health
+        self.heart =  pygame.transform.rotozoom(pygame.image.load(join('images', 'heart', 'heart.png')).convert_alpha(), 0, 1.9)
+        self.heart_rect1 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1345, 100))
+        self.heart_rect2 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1295, 100))
+        self.heart_rect3 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1245, 100))
+        self.heart_list = [self.heart_rect1, self.heart_rect2, self.heart_rect3]
         #gameOver Fonts
         colourBeige = (255,222,173)
         self.gameOverScreen_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 200)
@@ -163,6 +170,7 @@ class Shooter_Game:
         self.player.kill()
         self.gun.kill()
         self.shoot_rate = self.shoot_rate_glock
+        self.hardmode = False
 
     def gameOver_screen(self):
         colourBeige = (255,222,173)
@@ -174,6 +182,10 @@ class Shooter_Game:
         self.screen.blit(self.gameOverScreen_text, self.gameOverScreen_rect)
         self.screen.blit(self.gameOverPressEnter_text, self.gameOverPressEnter_rect)
         #self.screen.blit(self.returnBackMenu_text, self.returnBackMenu_rect)
+
+    def display_health(self):
+        for i in range(0, self.player.health):
+            self.screen.blit(self.heart, self.heart_list[i])
 
     #GameLogic if gameOn
     def running_GameOn(self):
@@ -195,12 +207,12 @@ class Shooter_Game:
             self.input_handling()
         
             self.screen.fill((0,200,0))
-            
             self.check_bullet_enemy_collision()
             self.update_gun()
             self.all_sprites.update(delta_t)
             self.all_sprites.draw(self.player.rect.center)
             
+            self.display_health()
             self.update_score()
             pygame.display.flip()
             print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}")
