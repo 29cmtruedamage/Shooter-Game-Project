@@ -19,9 +19,12 @@ class Shooter_Game:
         pygame.display.set_caption("Survivor-Shooter")
         self.clock  = pygame.time.Clock()
         self.FPS = 60
+        
+        #game states
         self.gameState = True
-        self.gameOn = True
+        self.gameOn = False
         self.gameOver = False
+        self.start_screen_state = True
         #Groups
         self.all_sprites = AllSprites()
         self.obstacle_group = pygame.sprite.Group()
@@ -44,8 +47,15 @@ class Shooter_Game:
         self.kills_to_change_gun = 30
         self.hardmode = False
 
+        #colours
+        self.LightGrey = (230, 230, 230)
+        self.DarkGrey =  (130, 130, 130)
+        self.colourBeige = (255,222,173)
+        self.colourGreen = (0, 139, 69)
+
         #score 
         self.score = 0
+
         #score Fonts
         self.score_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 53)
         self.score_text = self.score_font.render("Kills: ", True, 'Red')
@@ -57,21 +67,65 @@ class Shooter_Game:
         self.heart_rect2 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1295, 100))
         self.heart_rect3 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1245, 100))
         self.heart_list = [self.heart_rect1, self.heart_rect2, self.heart_rect3]
+
         #gameOver Fonts
-        colourBeige = (255,222,173)
+        
         self.gameOverScreen_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 200)
         self.gameOverPressEnter_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 80)
 
-        self.gameOverScreen_text = self.gameOverScreen_font.render("GAME OVER", False, colourBeige)
+        self.gameOverScreen_text = self.gameOverScreen_font.render("GAME OVER", False, self.colourBeige)
         self.gameOverScreen_rect = self.gameOverScreen_text.get_rect(center=(SCRREEN_WIDTH / 2, 200))
         
-        self.gameOverPressEnter_text = self.gameOverPressEnter_font.render("PRESS ENTER TO RESTART", True, colourBeige)
+        self.gameOverPressEnter_text = self.gameOverPressEnter_font.render("PRESS ENTER TO RESTART", True, self.colourBeige)
         self.gameOverPressEnter_rect = self.gameOverPressEnter_text.get_rect(center=(SCRREEN_WIDTH / 2, 450))
 
-        
+        #start Screen Fonts
+        self.text_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 150)
+        self.text_text1 = self.text_font.render("Welcome to this Game!", True, self.colourBeige)
+        self.text1_rect = self.text_text1.get_rect(center = (SCRREEN_WIDTH / 2, 170))
 
+        self.sign_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 70)
+        self.signt_text = self.sign_font.render("A Shooter, Made by Muhammed Emir Akgül", True, self.colourBeige)
+        self.sign_rect = self.signt_text.get_rect(center = (SCRREEN_WIDTH / 2, 320))
         
+        self.defaultVektor_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 100)
+        self.defaultVektor_text = self.defaultVektor_font.render("  Platzhalter  ", True, 'Black')
+        self.defaultVektor_rect = self.defaultVektor_text.get_rect(center = (SCRREEN_WIDTH / 2, 520))
         
+        self.vektor_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 70)
+        self.vektor_GameText1 = self.vektor_font.render("Play", True, 'Black')
+        self.vektor_rect1 = self.vektor_GameText1.get_rect(center = (SCRREEN_WIDTH / 2, 520))
+
+
+    def display_startScreen(self):
+        self.screen.fill(self.colourGreen)
+        self.screen.blit(self.signt_text, self.sign_rect)
+        self.screen.blit(self.text_text1, self.text1_rect)
+        mouse_pos = pygame.mouse.get_pos()
+        if self.defaultVektor_rect.collidepoint(mouse_pos):
+            pygame.draw.rect(self.screen, self.DarkGrey, self.defaultVektor_rect, 0, 50)
+            self.check_clickOn_play()
+        else:
+            pygame.draw.rect(self.screen, self.LightGrey, self.defaultVektor_rect, 0, 50)
+        self.screen.blit(self.vektor_GameText1, self.vektor_rect1)
+    
+    def check_clickOn_play(self):
+        leftclick = pygame.mouse.get_pressed()[0]
+        if leftclick:
+            self.start_screen_state = False
+            self.gameOn = True
+
+    def running_StartScreen(self):
+        while self.start_screen_state:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.start_screen_state = False
+                    self.gameState = False
+                    self.gameOn = False
+                    self.gameOver = False
+            self.display_startScreen()
+            pygame.display.flip()
+
     #sounds
     def load_sounds(self):
         self.shoot_sound = pygame.mixer.Sound(join('sound','shoot_sound.wav'))
@@ -173,11 +227,9 @@ class Shooter_Game:
         self.hardmode = False
 
     def gameOver_screen(self):
-        colourBeige = (255,222,173)
-        colourGreen = (0, 139, 69)
-        self.showScore_text = self.gameOverPressEnter_font.render(f"You got {self.score} kills", True, colourBeige)
+        self.showScore_text = self.gameOverPressEnter_font.render(f"You got {self.score} kills", True, self.colourBeige)
         self.showScore_rect = self.showScore_text.get_rect(center=(SCRREEN_WIDTH / 2, 350))
-        self.screen.fill(colourGreen)
+        self.screen.fill(self.colourGreen)
         self.screen.blit(self.showScore_text, self.showScore_rect)
         self.screen.blit(self.gameOverScreen_text, self.gameOverScreen_rect)
         self.screen.blit(self.gameOverPressEnter_text, self.gameOverPressEnter_rect)
@@ -217,6 +269,7 @@ class Shooter_Game:
             pygame.display.flip()
             print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}")
 
+
     #GameLogic if gameOver
     def running_GameOver(self):
         self.gameOver_screen()
@@ -232,8 +285,7 @@ class Shooter_Game:
                     if event.key == pygame.K_RETURN:
                         self.gameOver = False
                         self.gameOn = True
-
-            
+                        
             pygame.display.flip()
 
 
@@ -248,6 +300,7 @@ class Shooter_Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.gameState = False
+            self.running_StartScreen()
 
             self.running_GameOn()
             self.bg_sound.stop()
