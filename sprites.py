@@ -33,7 +33,7 @@ class Enemy(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-20, -40)
         self.direction = pygame.Vector2()
         self.type = 'enemy'
-        self.speed = 160
+        self.speed = 20
         if hardMode: self.speed = 220
 
     def animation_maker(self):
@@ -130,3 +130,35 @@ class Bullet(pygame.sprite.Sprite):
         self.rect.center += self.direction * self.speed * delta_t
         if self.death_time - self.current_lifetime < self.born_date:
             self.kill()
+
+class Packs(pygame.sprite.Sprite):
+    def __init__(self, type, frame, pos, player, pack_group, groups, spawn_allowence):
+        super().__init__(groups)
+        self.spawn_allowence = spawn_allowence
+        self.pos = pos
+        self.image = frame
+        self.rect = self.image.get_frect(center= pos)
+        self.player = player
+        self.type = type
+        self.pack_group = pack_group
+    
+    # def check_if_already_exists(self):
+    #     for pack in self.pack_group:
+    #         if pack.pos == self.pos:
+    #             self.kill()
+
+    def collide_with_player(self):
+        if self.rect.colliderect(self.player.hitbox):
+            if self.type == 'health' and self.player.health < 3:
+                self.player.health += 1
+                self.kill()
+                self.spawn_allowence[self.pos] = True
+            if self.type == 'ammu':
+                self.player.ammunition = 100
+                self.kill()
+                self.spawn_allowence[self.pos] = True
+
+    def update(self, _):
+        #self.check_if_already_exists()
+        self.collide_with_player()
+  

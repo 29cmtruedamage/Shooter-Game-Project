@@ -5,7 +5,7 @@ import math
 from globals import SCRREEN_WIDTH, SCREEN_HEIGHT, TILE_SIZE
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, groups, obstacle_group, enemy_group):
+    def __init__(self, pos, groups, health, ammunition, obstacle_group, enemy_group):
         super().__init__(groups)
         self.all_movements = {'down': [], 'up': [], 'left': [], 'right': []}
         self.load_animations()
@@ -19,7 +19,8 @@ class Player(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-55, -110)
         self.type = 'player'
         self.index = 0
-        self.health = 3
+        self.health = health
+        self.ammunition = ammunition
         self.recovery_time = 200
         self.sprinting = False
 
