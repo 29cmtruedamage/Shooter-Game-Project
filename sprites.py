@@ -133,16 +133,22 @@ class Packs(pygame.sprite.Sprite):
         self.player = player
         self.type = type
         self.pack_group = pack_group
-
+        self.heal_sound = pygame.mixer.Sound(join('sound','heal_sound.mp3'))
+        self.heal_sound.set_volume(2)
+        self.reload_sound = pygame.mixer.Sound(join('sound','reload_sound.mp3'))
+        self.reload_sound.set_volume(2)
+        
     def collide_with_player(self):
         if self.rect.colliderect(self.player.hitbox):
             if self.type == 'health' and self.player.health < 3:
                 self.player.health += 1
                 self.kill()
+                self.heal_sound.play()
                 self.spawn_allowence[self.pos] = True
             if self.type == 'ammu':
                 self.player.ammunition = 100
                 self.kill()
+                self.reload_sound.play()
                 self.spawn_allowence[self.pos] = True
 
     def update(self, _):
