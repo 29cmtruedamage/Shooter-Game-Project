@@ -259,6 +259,7 @@ class Shooter_Game:
         self.bullet_group.empty()
         self.player.kill()
         self.gun.kill()
+        self.pack_group.empty()
         self.shoot_rate = self.shoot_rate_glock
         self.hardmode = False
 
@@ -296,7 +297,7 @@ class Shooter_Game:
                     pos = random.choice(self.pack_spawnPos)
                     if self.pack_spawnAllowence[pos]:
                         if self.player.health < 3:
-                            type = random.choice(['health'])
+                            type = random.choice(['ammu', 'health'])
                         if self.player.health >= 3:
                             type = random.choice(['ammu', 'ammu', 'ammu', 'ammu', 'health'])   
                         Packs(type, self.packs_surfList[type],  pos, self.player, self.pack_group, (self.pack_group, self.all_sprites), self.pack_spawnAllowence)
@@ -317,9 +318,9 @@ class Shooter_Game:
             pygame.display.flip()
             #print(pygame.time.get_ticks())
             #print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}")
-            print(f"A: {self.player.time_now}, B: {self.player.time_till_full_recovery}")
+            #print(f"A: {self.player.time_now}, B: {self.player.time_till_full_recovery}")
             #print(self.pack_group)
-
+            
     #GameLogic if gameOver
     def running_GameOver(self):
         self.gameOver_screen()
@@ -345,7 +346,7 @@ class Shooter_Game:
         self.load_sounds()
         self.setup_map()
         self.load_dynamic_images()
-
+        input("schreiben sie Ihren Namen: ")
         while self.gameState:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
