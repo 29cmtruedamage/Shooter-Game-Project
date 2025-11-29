@@ -19,9 +19,16 @@ class Player(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-55, -110)
         self.type = 'player'
         self.index = 0
+        
+        #packs
         self.health = health
         self.ammunition = ammunition
-        self.recovery_time = 200
+        
+        #recovery
+        self.time_now = pygame.time.get_ticks() 
+        self.recovery_time = 3000
+        self.time_till_full_recovery = self.time_now + self.recovery_time 
+        
         self.sprinting = False
 
         self.hit_sound = pygame.mixer.Sound(join('sound','hit_sound.mp3'))
@@ -58,10 +65,11 @@ class Player(pygame.sprite.Sprite):
 
     #animate the player based on the direction
     def animation_maker(self, state):
-        self.index += 0.035 #Geschwindigkeit der Animation
+        #Geschwindigkeit der Animation
         if self.sprinting:
-            self.index += 0.02
-        self.index %= 4     #Anzahl Bilder pro richtung
+            self.index = int(pygame.time.get_ticks() / 60) % 4
+        else:
+            self.index = int(pygame.time.get_ticks() / 80) % 4     #Anzahl Bilder pro richtung
         self.image = self.all_movements[state][int(self.index)]
 
     #calculates the new position after imput handling
@@ -73,13 +81,13 @@ class Player(pygame.sprite.Sprite):
         self.rect.center = self.hitbox.center  
 
     def check_enemy_collision(self):
-        self.recovery_time += 1
+        self.time_now = pygame.time.get_ticks()
         for enemy in self.enemy_group:
-            if self.recovery_time > 400: # You have 400ms to flee away from enemies
+            if self.time_now > self.time_till_full_recovery: # You have 400ms to flee away from enemies
                 if self.hitbox.colliderect(enemy.hitbox):
                     self.hit_sound.play()
                     self.health -= 1
-                    self.recovery_time = 0
+                    self.time_till_full_recovery = self.time_now + self.recovery_time
 
     #handles collision between player and obstacles
     def collision_handling(self):
