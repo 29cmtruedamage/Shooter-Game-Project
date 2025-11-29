@@ -52,7 +52,7 @@ class Shooter_Game:
 
         #packs
         self.pack_spawnEvent = pygame.event.custom_type()
-        self.pack_spawnTime = 8000
+        self.pack_spawnTime = 5000
         pygame.time.set_timer(self.pack_spawnEvent, self.pack_spawnTime)
         self.pack_spawnPos = []
         self.pack_spawnAllowence = {}
@@ -346,7 +346,7 @@ class Shooter_Game:
         self.load_sounds()
         self.setup_map()
         self.load_dynamic_images()
-        input("schreiben sie Ihren Namen: ")
+        
         while self.gameState:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
