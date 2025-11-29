@@ -153,10 +153,14 @@ class Shooter_Game:
         self.deat_sound.set_volume(0.5)
         self.bg_sound = pygame.mixer.Sound(join('sound','bg_sound.mp3'))
         self.bg_sound.set_volume(0.1)
-        self.menu_sound = pygame.mixer.Sound(join('sound','aa.mp3'))
+        self.menu_sound = pygame.mixer.Sound(join('sound','menu.mp3'))
         self.menu_sound.set_volume(0.4)
         self.update_sound = pygame.mixer.Sound(join('sound','update_sound.mp3'))
         self.update_sound.set_volume(2)
+        self.heal_sound = pygame.mixer.Sound(join('sound','heal_sound.mp3'))
+        self.heal_sound.set_volume(2)
+        self.reload_sound = pygame.mixer.Sound(join('sound','reload_sound.mp3'))
+        self.reload_sound.set_volume(2)
         
     def load_dynamic_images(self):
         #bullet
