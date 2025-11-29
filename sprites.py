@@ -33,12 +33,11 @@ class Enemy(pygame.sprite.Sprite):
         self.hitbox = self.rect.inflate(-20, -40)
         self.direction = pygame.Vector2()
         self.type = 'enemy'
-        self.speed = 20
+        self.speed = 160
         if hardMode: self.speed = 220
 
     def animation_maker(self):
-        self.index += 0.035 #Geschwindigkeit der Animation
-        self.index %= 4     #Anzahl Bilder pro richtung
+        self.index = int(pygame.time.get_ticks() / 80) % 4    #Anzahl Bilder pro richtung
         self.image = self.frames[int(self.index)]
 
     def movement(self, delta_t):
@@ -118,14 +117,7 @@ class Bullet(pygame.sprite.Sprite):
         self.current_lifetime = 0
         self.enemy_group = enemy_group
 
-    def check_collision(self):
-        pass
-        # for enemy in self.enemy_group:
-        #     if self.rect.colliderect(enemy.rect):
-        #         self.kill()
-
     def update(self, delta_t):
-        self.check_collision()
         self.current_lifetime += 5
         self.rect.center += self.direction * self.speed * delta_t
         if self.death_time - self.current_lifetime < self.born_date:
@@ -141,11 +133,6 @@ class Packs(pygame.sprite.Sprite):
         self.player = player
         self.type = type
         self.pack_group = pack_group
-    
-    # def check_if_already_exists(self):
-    #     for pack in self.pack_group:
-    #         if pack.pos == self.pos:
-    #             self.kill()
 
     def collide_with_player(self):
         if self.rect.colliderect(self.player.hitbox):
@@ -159,6 +146,5 @@ class Packs(pygame.sprite.Sprite):
                 self.spawn_allowence[self.pos] = True
 
     def update(self, _):
-        #self.check_if_already_exists()
         self.collide_with_player()
   

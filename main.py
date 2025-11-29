@@ -33,11 +33,13 @@ class Shooter_Game:
         self.pack_group = pygame.sprite.Group()
         #Gun parameters
         self.shoot_timer = 0
-        self.shoot_rate_glock = 100 #glock
-        self.shoot_rate_uzi = 40 #uzi
+        self.shoot_rate_glock = 350 #glock
+        self.shoot_rate_uzi = 200 #uzi
+        self.current_gun_rate = self.shoot_rate_glock
+        self.shoot_rate = pygame.time.get_ticks() + self.current_gun_rate
+        
         self.ammunition = 100
 
-        self.shoot_rate = self.shoot_rate_glock
 
         #custom events / time based eventy
         self.enemie_spawnEvent = pygame.event.custom_type()
@@ -50,7 +52,7 @@ class Shooter_Game:
 
         #packs
         self.pack_spawnEvent = pygame.event.custom_type()
-        self.pack_spawnTime = 2000
+        self.pack_spawnTime = 10000
         pygame.time.set_timer(self.pack_spawnEvent, self.pack_spawnTime)
         self.pack_spawnPos = []
         self.pack_spawnAllowence = {}
@@ -61,24 +63,33 @@ class Shooter_Game:
         self.DarkGrey =  (130, 130, 130)
         self.colourBeige = (255,222,173)
         self.colourGreen = (0, 139, 69)
-
+        self.Grey = (31,31,31)
         #score 
         self.score = 0
+        
+        #load
+        self.load_fonts()
 
+    def load_fonts(self):
+        #Ammunition Font
+        self.ammu_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 53)
+        self.ammu_text = self.ammu_font.render("Ammu: ", True, self.Grey)
+        self.ammu_rect = self.ammu_text.get_rect(center=(SCRREEN_WIDTH / 10, 150))
+        
+        
         #score Fonts
         self.score_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 53)
         self.score_text = self.score_font.render("Kills: ", True, 'Red')
-        self.score_rect = self.score_text.get_rect(center=(SCRREEN_WIDTH / 10, 50))
+        self.score_rect = self.score_text.get_rect(center=(SCRREEN_WIDTH / 10, 100))
 
         #health
         self.heart =  pygame.transform.rotozoom(pygame.image.load(join('images', 'heart', 'heart.png')).convert_alpha(), 0, 1.9)
-        self.heart_rect1 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1345, 100))
-        self.heart_rect2 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1295, 100))
-        self.heart_rect3 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1245, 100))
+        self.heart_rect1 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1345, 50))
+        self.heart_rect2 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1295, 50))
+        self.heart_rect3 = self.heart.get_frect(center=(SCRREEN_WIDTH - 1245, 50))
         self.heart_list = [self.heart_rect1, self.heart_rect2, self.heart_rect3]
 
         #gameOver Fonts
-        
         self.gameOverScreen_font = pygame.font.Font(join('textstyles','textStyle1.ttf'), 200)
         self.gameOverPressEnter_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 80)
 
@@ -104,7 +115,6 @@ class Shooter_Game:
         self.vektor_font = pygame.font.Font(join('textstyles', 'textStyle1.ttf'), 70)
         self.vektor_GameText1 = self.vektor_font.render("Play", True, 'Black')
         self.vektor_rect1 = self.vektor_GameText1.get_rect(center = (SCRREEN_WIDTH / 2, 520))
-
 
     def display_startScreen(self):
         self.screen.fill(self.colourGreen)
@@ -161,7 +171,7 @@ class Shooter_Game:
         #ammu and health packs
         self.healthpack_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'healthpack.png')).convert_alpha(), 0, 2.5)
         self.ammupack_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'ammunition.png')).convert_alpha(), 0, 2.5)
-        self.packs = {'ammu': self.ammupack_surf, 'health': self.healthpack_surf}
+        self.packs_surfList = {'ammu': self.ammupack_surf, 'health': self.healthpack_surf}
 
     def setup_map(self):
         map = load_pygame(join('assets', 'map', 'map.tmx'))
@@ -184,8 +194,8 @@ class Shooter_Game:
 
         for pack in map.get_layer_by_name('packs_spawnpoints'):
             pos = (pack.x, pack.y)
-            self.pack_spawnPos.append(pos)
-            self.pack_spawnAllowence[pos] = True
+            self.pack_spawnPos.append(pos) #list of all possible positions
+            self.pack_spawnAllowence[pos] = True #we tag a Bool to every pos, to check if pos is locked
 
         for sp in map.get_layer_by_name('spawnpoint_player'):
             self.sp_pos = (sp.x, sp.y)
@@ -201,7 +211,7 @@ class Shooter_Game:
             self.glock.kill()
             self.uzi = Gun(self.player, self.all_sprites, 'uzi')
             self.gun = self.uzi
-            self.shoot_rate = self.shoot_rate_uzi
+            self.current_gun_rate = self.shoot_rate_uzi
             self.hardmode = True
             self.update_sound.play()
 
@@ -209,16 +219,20 @@ class Shooter_Game:
         self.score_text = self.score_font.render(f"KILLS: {self.score}", True, (189,61,61))
         self.screen.blit(self.score_text, self.score_rect)
 
+    def update_ammu(self):
+        self.ammu_text = self.ammu_font.render(f"Ammu: {self.player.ammunition}", True, self.Grey)
+        self.screen.blit(self.ammu_text, self.ammu_rect)
+
     #gun Shoot: Input handling
     def input_handling(self):
         leftclick = pygame.mouse.get_pressed()[0]
-        self.shoot_timer += 1
+        self.shoot_timer = pygame.time.get_ticks()
 
         if leftclick and self.shoot_timer > self.shoot_rate and self.player.ammunition > 0:
             pos = self.gun.rect.center + self.gun.player_dir * 100
             self.shoot_sound.play()
             Bullet(self.bullet_surf, pos, self.gun.player_dir, (self.all_sprites, self.bullet_group), self.enemy_group)
-            self.shoot_timer = 0
+            self.shoot_rate = pygame.time.get_ticks() + self.current_gun_rate
             self.player.ammunition -= 1
             
     def check_bullet_enemy_collision(self):
@@ -272,18 +286,20 @@ class Shooter_Game:
                     self.gameState = False
                     self.gameOn = False
                     self.gameOver = False
+                
                 if event.type == self.enemie_spawnEvent:
                     type = random.choice(['bat', 'blob', 'skeleton'])
                     pos = random.choice(self.enemie_spawnPlace)
                     Enemy(self.enemies[type], pos, self.player, (self.all_sprites, self.enemy_group), self.obstacle_group, self.bullet_group, self.hardmode)
+                
                 if event.type == self.pack_spawnEvent:
                     pos = random.choice(self.pack_spawnPos)
                     if self.pack_spawnAllowence[pos]:
                         if self.player.health < 3:
                             type = random.choice(['health'])
                         if self.player.health >= 3:
-                            type = random.choice(['ammu', 'ammu', 'ammu', 'ammu', 'health'])    
-                        Packs(type, self.packs[type],  pos, self.player, self.pack_group, (self.pack_group, self.all_sprites), self.pack_spawnAllowence)
+                            type = random.choice(['ammu', 'ammu', 'ammu', 'ammu', 'health'])   
+                        Packs(type, self.packs_surfList[type],  pos, self.player, self.pack_group, (self.pack_group, self.all_sprites), self.pack_spawnAllowence)
                         self.pack_spawnAllowence[pos] = False
                         
             self.check_death()
@@ -297,9 +313,12 @@ class Shooter_Game:
             
             self.display_health()
             self.update_score()
+            self.update_ammu()
             pygame.display.flip()
-            #print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}, Your Ammuntion: {self.player.ammunition}")
-            print(self.pack_group)
+            #print(pygame.time.get_ticks())
+            #print(f"Your Healt: {self.player.health}, Your Recovery Time: {self.player.recovery_time}")
+            print(f"A: {self.player.time_now}, B: {self.player.time_till_full_recovery}")
+            #print(self.pack_group)
 
     #GameLogic if gameOver
     def running_GameOver(self):
