@@ -13,24 +13,25 @@ This project is a Top-Down-Shooter developed using [Pygame-CE](https://pygame-ce
 - **Sprint:** `Shift` (hold)  
 - **Shoot:** Left click  
 
-## Play the Game - Step by Step installation
+# Play the Game - Step by Step installation
 
 ### Requirements
 
 - Python 3.10 or higher
 - Pygame-CE
-  
-### Windows
+- Pytmx
+## Windows
 
 #### Installing Pygame-CE
 
 1. Open Command Prompt (CMD) or PowerShell. (Windows Key + R, then type CMD)
-2. Install Pygame-CE using pip:
+2. Install Pygame-CE and Pytmx using pip:
 
 ```bash
 pip install pygame-ce
+pip install pytmx
 ```
-3. Test installation
+3. Test if installation was successful
 
 ```bash
 python -m pygame.examples.aliens
@@ -46,17 +47,18 @@ git clone https://github.com/29cmtruedamage/Shooter-Game-Project.git
 ```bash
 python -m main
 ```
-#### MacOS
+## MacOS
 
 #### Installing Pygame-CE
 
 1. Open Terminal
-2. Install Pygame-CE using pip3:
+2. Install Pygame-CE and Pytmx using pip3:
 
 ```bash
 pip3 install pygame-ce
+pip3 install pytmx
 ```
-3. Test installation
+3. Test if installation was successful
 
 ```bash
 python3 -m pygame.examples.aliens
@@ -103,6 +105,7 @@ Shooter-Game-Project/
 └── requirements.txt
 
 ├── .gitignore
+
 
 
 
