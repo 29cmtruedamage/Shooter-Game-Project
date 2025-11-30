@@ -20,16 +20,26 @@ This project is a Top-Down-Shooter developed using [Pygame-CE](https://pygame-ce
 - Python 3.10 or higher
 - Pygame-CE
 - Pytmx
+- Git
 ## Windows
 
 #### Installing Pygame-CE
 
 1. Open Command Prompt (CMD) or PowerShell. (Windows Key + R, then type CMD)
-2. Install Pygame-CE and Pytmx using pip:
+2. Install Pygame-CE and Pytmx using pip (just copy paste it and press enter):
 
 ```bash
 pip install pygame-ce
+```
+```bash
 pip install pytmx
+```
+If this doesnt work, try this:
+```bash
+python -m pip install pygame-ce
+```
+```bash
+python -m pip install pygamne-ce
 ```
 3. Test if installation was successful
 
@@ -39,7 +49,6 @@ python -m pygame.examples.aliens
 4. Now Install/Clone this Repository
 
 ```bash
-cd Desktop
 git clone https://github.com/29cmtruedamage/Shooter-Game-Project.git
 ```
 5. Finally, start the game
@@ -52,11 +61,20 @@ python -m main
 #### Installing Pygame-CE
 
 1. Open Terminal
-2. Install Pygame-CE and Pytmx using pip3:
+2. Install Pygame-CE and Pytmx using pip3 (just copy paste it and press enter):
 
 ```bash
 pip3 install pygame-ce
+```
+```bash
 pip3 install pytmx
+```
+If this doesnt work, try this:
+```bash
+python3 -m pip3 install pygame-ce
+```
+```bash
+python3 -m pip3 install pygamne-ce
 ```
 3. Test if installation was successful
 
@@ -66,7 +84,6 @@ python3 -m pygame.examples.aliens
 4. Now Install/Clone this Repository
 
 ```bash
-cd Desktop
 git clone https://github.com/29cmtruedamage/Shooter-Game-Project.git
 ```
 5. Finally, start the game
@@ -76,13 +93,13 @@ python3 -m main
 ```
 
 
-## Project Structure
+## Project Sourcecode Structure
 
 Shooter-Game-Project/
 
 ├── main.py          
 
-├── player.py
+├── characters.py
 
 ├── sprites.py
 
@@ -92,19 +109,8 @@ Shooter-Game-Project/
 
 ├── init.py
 
-├── images/
 
-├── textstyles/
 
-├── sound/
-
-├── assets/          
-
-├── README.md        
-
-└── requirements.txt
-
-├── .gitignore
 
 
 
