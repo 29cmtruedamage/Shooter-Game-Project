@@ -17,10 +17,10 @@ This project is a Top-Down-Shooter developed using [Pygame-CE](https://pygame-ce
 
 ### Requirements
 
-- Python 3.10 or higher
+- [Python 3.10](https://www.python.org/downloads/) or higher
 - Pygame-CE
 - Pytmx
-- Git
+- [Git](https://git-scm.com/install/)
 ## Windows
 
 #### Installing Pygame-CE
@@ -108,6 +108,7 @@ Shooter-Game-Project/
 ├── globals.py
 
 ├── init.py
+
 
 
 
