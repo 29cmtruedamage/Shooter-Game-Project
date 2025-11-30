@@ -61,7 +61,8 @@ class Player(pygame.sprite.Sprite):
                 for file in files:
                     surf = pygame.image.load(join(path, file)).convert_alpha()
                     self.all_movements[direction].append(surf)
-                    print(join(path, file))
+                    
+                    
 
     #animate the player based on the direction
     def animation_maker(self, state):
@@ -102,4 +103,64 @@ class Player(pygame.sprite.Sprite):
         self.input_handling()
         self.movement_handling(delta_t)
         self.check_enemy_collision()
+        
+class Enemy(pygame.sprite.Sprite):
+    def __init__(self, frames, pos, player, groups, obstacle_group, bullet_group, hardMode):
+        super().__init__(groups)
+        self.frames = frames
+        self.player = player
+        self.obstacle_group = obstacle_group
+        self.bullet_group = bullet_group
+        self.index = 0
+        self.image = self.frames[self.index]
+        self.rect = self.image.get_frect(center = pos)
+        self.hitbox = self.rect.inflate(-20, -40)
+        self.direction = pygame.Vector2()
+        self.type = 'enemy'
+        self.speed = 160
+        if hardMode: self.speed = 220
+        self.health = 1
+        self.deat_sound = pygame.mixer.Sound(join('sound','death_sound.wav'))
+        self.deat_sound.set_volume(0.5)
+        
+    def animation_maker(self):
+        self.index = int(pygame.time.get_ticks() / 80) % 4    #Anzahl Bilder pro richtung
+        self.image = self.frames[int(self.index)]
+
+    def movement(self, delta_t):
+        player_pos = pygame.Vector2(self.player.rect.center)
+        enemy_pos = pygame.Vector2(self.rect.center)
+        self.direction = (player_pos - enemy_pos).normalize()
+      
+        self.hitbox.x += self.direction.x * self.speed * delta_t
+        self.collision_handling()
+        self.hitbox.y += self.direction.y * self.speed * delta_t
+        self.collision_handling()
+        self.rect.center = self.hitbox.center 
+
+    def collision_handling(self):
+        for g in self.obstacle_group:
+            if self.hitbox.colliderect(g.rect):
+                if self.hitbox.right < g.rect.left + 20: self.hitbox.right = g.rect.left #links
+                if self.hitbox.left > g.rect.right - 20: self.hitbox.left = g.rect.right #rechts
+                if self.hitbox.bottom < g.rect.top + 20: self.hitbox.bottom = g.rect.top
+                if self.hitbox.top > g.rect.bottom -20: self.hitbox.top = g.rect.bottom
+
+    def check_death(self):
+        if self.health < 1:
+            self.deat_sound.play()
+            self.kill()
+            return True
+            
+    def update(self, delta_t): 
+        self.check_death
+        self.movement(delta_t)
+        self.animation_maker()
+        
+class BossEnemy(Enemy):
+    def __init__(self, frames, pos, player, groups, obstacle_group, bullet_group, hardMode):
+        super().__init__(frames, pos, player, groups, obstacle_group, bullet_group, hardMode)
+        self.health = 4
+        self.speed = 100
+        self.hitbox = self.rect.inflate(-60, -80)
         

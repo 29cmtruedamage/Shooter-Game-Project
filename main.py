@@ -1,7 +1,7 @@
 import pygame
 import time
-from player import Player
-from sprites import Obstacles, TileSprites, Gun, Bullet, Enemy, Packs
+from characters import Player, Enemy, BossEnemy
+from sprites import Obstacles, TileSprites, Gun, Bullet, Packs
 from sprite_groups import AllSprites #, ShootingSprites
 from pytmx.util_pygame import load_pygame
 #https://pytmx.readthedocs.io/en/latest/#tile-object-and-map-properties
@@ -43,12 +43,18 @@ class Shooter_Game:
 
         #custom events / time based eventy
         self.enemie_spawnEvent = pygame.event.custom_type()
-        self.enemie_spawnTime = 400
+        self.enemie_spawnTime = 500
         pygame.time.set_timer(self.enemie_spawnEvent, self.enemie_spawnTime)
         self.enemie_spawnPlace = []
         self.sp_pos = (0,0)
         self.kills_to_change_gun = 30
         self.hardmode = False
+        
+        #custom event 2 - BossEnemy
+        self.BossEnemy_spawnEvent = pygame.event.custom_type()
+        self.BossEnemy_spawnTime = 10000
+        pygame.time.set_timer(self.BossEnemy_spawnEvent, self.BossEnemy_spawnTime)
+        self.BossEnemy_spawnPlace = []
 
         #packs
         self.pack_spawnEvent = pygame.event.custom_type()
@@ -152,9 +158,9 @@ class Shooter_Game:
         self.deat_sound = pygame.mixer.Sound(join('sound','death_sound.wav'))
         self.deat_sound.set_volume(0.5)
         self.bg_sound = pygame.mixer.Sound(join('sound','bg_sound.mp3'))
-        self.bg_sound.set_volume(0.1)
+        self.bg_sound.set_volume(0.3)
         self.menu_sound = pygame.mixer.Sound(join('sound','menu_sound.mp3'))
-        self.menu_sound.set_volume(0.4)
+        self.menu_sound.set_volume(0.3)
         self.update_sound = pygame.mixer.Sound(join('sound','update_sound.mp3'))
         self.update_sound.set_volume(2)
         
@@ -163,11 +169,15 @@ class Shooter_Game:
         self.bullet_surf = pygame.image.load(join('images', 'gun', 'bullet.png')).convert_alpha()
         #enemies
         self.enemies = {'bat': [], 'blob': [], 'skeleton': []}
+        self.BossEnemys = {'bat': [], 'blob': [], 'skeleton': []}
         for enemie in self.enemies:
             for path, subfolder, files in walk(join('images', 'enemies', enemie)):
                 for file in files:
                     surf = pygame.image.load(join(path, file)).convert_alpha()
+                    boss_surf = pygame.transform.rotozoom(pygame.image.load(join(path, file)).convert_alpha(), 0, 1.8)
                     self.enemies[enemie].append(surf)
+                    self.BossEnemys[enemie].append(boss_surf)
+                    
         #ammu and health packs
         self.healthpack_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'healthpack.png')).convert_alpha(), 0, 2.5)
         self.ammupack_surf = pygame.transform.rotozoom(pygame.image.load(join('images', 'gun', 'ammunition.png')).convert_alpha(), 0, 2.5)
@@ -239,10 +249,11 @@ class Shooter_Game:
         for bullet in self.bullet_group:
             for enemy in self.enemy_group:
                 if bullet.rect.colliderect(enemy.rect):
-                    self.score += 1
-                    enemy.kill()
+                    enemy.health -= 1
                     bullet.kill()
-                    self.deat_sound.play()
+                    if enemy.check_death():
+                        self.score += 1
+                    
 
     def check_death(self):
         #unser leben: self.health
@@ -303,6 +314,11 @@ class Shooter_Game:
                         Packs(type, self.packs_surfList[type],  pos, self.player, self.pack_group, (self.pack_group, self.all_sprites), self.pack_spawnAllowence)
                         self.pack_spawnAllowence[pos] = False
                         
+                if event.type == self.BossEnemy_spawnEvent and self.score > 25:
+                    type = random.choice(['bat', 'blob', 'skeleton'])
+                    pos = random.choice(self.enemie_spawnPlace)
+                    BossEnemy(self.BossEnemys[type], pos, self.player, (self.all_sprites, self.enemy_group), self.obstacle_group, self.bullet_group, self.hardmode)
+                
             self.check_death()
             self.input_handling()
         
