@@ -39,7 +39,7 @@ If this doesnt work, try this:
 python -m pip install pygame-ce
 ```
 ```bash
-python -m pip install pygamne-ce
+python -m pip install pytmx
 ```
 3. Test if installation was successful
 
@@ -74,7 +74,7 @@ If this doesnt work, try this:
 python3 -m pip3 install pygame-ce
 ```
 ```bash
-python3 -m pip3 install pygamne-ce
+python3 -m pip3 install pytmx
 ```
 3. Test if installation was successful
 
@@ -108,6 +108,7 @@ Shooter-Game-Project/
 ├── globals.py
 
 ├── init.py
+
 
 
 
