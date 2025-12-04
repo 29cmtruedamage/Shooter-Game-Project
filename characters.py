@@ -160,7 +160,7 @@ class Enemy(pygame.sprite.Sprite):
 class BossEnemy(Enemy):
     def __init__(self, frames, pos, player, groups, obstacle_group, bullet_group, hardMode):
         super().__init__(frames, pos, player, groups, obstacle_group, bullet_group, hardMode)
-        self.health = 4
+        self.health = 10
         self.speed = 100
         self.hitbox = self.rect.inflate(-60, -80)
         
