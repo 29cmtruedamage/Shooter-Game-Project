@@ -5,7 +5,8 @@
 This project is a Top-Down-Shooter developed using [Pygame-CE](https://pygame-ce.org/) for the Game-Logic and [Tiled](https://www.mapeditor.org/) for the own custom designed map. The player controls a character that can move, sprint, and shoot.
 
 ## Demonstration on YouTube
-[***HERE THE LINK TO VIDEO***]
+[https://youtu.be/TnpEycG-C3A](https://youtu.be/TnpEycG-C3A) 
+(enjoy in cinema mode)
 
 ## Controls
 
@@ -108,6 +109,7 @@ Shooter-Game-Project/
 ├── globals.py
 
 ├── init.py
+
 
 
 
